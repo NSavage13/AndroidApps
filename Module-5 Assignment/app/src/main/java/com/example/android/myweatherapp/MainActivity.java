@@ -17,8 +17,8 @@ public class MainActivity extends AppCompatActivity implements MyWeatherTaskList
 
     //Web URL of the JSON file
     private String mApiKey = "c9a1e8fde73a399c4c08b3d29a246b73";
-    private String mCity = "Chicago";
-    private String mCountry = "United States";
+    private String mCity = "Economy";
+    private String mCountry = "Pennsylvania";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
