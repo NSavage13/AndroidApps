@@ -4,12 +4,13 @@ package com.example.android.recipe.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.android.recipe.MainActivity
 import com.example.android.recipe.R
 import com.example.android.recipe.model.Flavor
 import com.example.android.recipe.model.Recipe
 import com.example.android.recipe.viewholder.FlavorTitleViewHolder
-import com.example.android.recipe.viewholder.RecipeViewHolder
 
 class RecipeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val items: MutableList<Any> = mutableListOf()
@@ -63,8 +64,7 @@ class RecipeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     override fun getItemViewType(position: Int): Int {
-        val item = items[position]
-        return when (item) {
+        return when (items[position]) {
             is Flavor -> VIEW_TYPE_FLAVOR_TITLE
             is Recipe -> VIEW_TYPE_RECIPE
             else -> throw IllegalArgumentException("Invalid item type")
@@ -76,5 +76,23 @@ class RecipeAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     companion object {
         private const val VIEW_TYPE_FLAVOR_TITLE = 0
         private const val VIEW_TYPE_RECIPE = 1
+    }
+    inner class RecipeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val recipeTitleTextView: TextView = itemView.findViewById(R.id.recipeTitleTextView)
+
+        init {
+            itemView.setOnClickListener {
+                val position = absoluteAdapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val recipe = items[position]
+                    val activity = itemView.context as MainActivity
+                    activity.showRecipeDescription(recipe as Recipe)
+                }
+            }
+        }
+
+        fun bind(recipe: Recipe) {
+            recipeTitleTextView.text = recipe.title
+        }
     }
 }

@@ -7,6 +7,7 @@ import com.example.android.recipe.R
 import com.example.android.recipe.model.Recipe
 
 class RecipeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
     private val recipeTitleTextView: TextView = itemView.findViewById(R.id.recipeTitleTextView)
 
     fun bind(recipe: Recipe) {
