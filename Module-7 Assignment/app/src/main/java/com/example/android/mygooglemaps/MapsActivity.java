@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.widget.Button;
@@ -47,16 +46,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (ContextCompat.checkSelfPermission(MapsActivity.this, ACCESS_FINE_LOCATION) == PERMISSION_GRANTED) {
                 LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 if (locationManager != null) {
-                    locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, new LocationListener() {
-                        @Override
-                        public void onLocationChanged(@NonNull Location location) {
-                            LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                            mMap.clear(); // Clear previous markers
-                            mMap.addMarker(new MarkerOptions().position(currentLocation).title("Parked Here"));
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15));
-                            saveLocation(currentLocation); // Save the current location
-                            Toast.makeText(MapsActivity.this, "Location retrieved", Toast.LENGTH_SHORT).show();
-                        }
+                    locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, location -> {
+                        LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                        mMap.clear(); // Clear previous markers
+                        mMap.addMarker(new MarkerOptions().position(currentLocation).title("Parked Here"));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15));
+                        saveLocation(currentLocation); // Save the current location
+                        Toast.makeText(MapsActivity.this, "Location retrieved", Toast.LENGTH_SHORT).show();
                     }, null);
                 }
             } else {
@@ -97,11 +93,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PERMISSION_GRANTED) {
-                // Permission granted, handle location-related tasks if needed
-
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                if (locationManager != null) {
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, location -> {
+                        LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                        mMap.addMarker(new MarkerOptions().position(currentLocation).title("My Location"));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation));
+                        saveLocation(currentLocation); // Save the current location
+                        Toast.makeText(MapsActivity.this, "Location retrieved", Toast.LENGTH_SHORT).show();
+                    });
+                }
             } else {
-                // Permission denied, handle the case where the user denied the permission
                 Toast.makeText(this, "Location permission denied", Toast.LENGTH_SHORT).show();
             }
         }
